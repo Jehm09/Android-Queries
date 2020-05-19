@@ -1,12 +1,14 @@
 package main
 
-import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"github.com/gorilla/mux"
-)
+// import (
+// 	"log"
+// 	"net/http"
 
-func main() {
+// 	"./server"
+// )
 
-}
+// func main() {
+// 	s := server.New()
+
+// 	log.Fatal(http.ListenAndServe(":808s0", s.Router()))
+// }
