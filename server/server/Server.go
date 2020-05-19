@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	domain "github.com/Jehm09/Android-Queries/tree/master/server/repository"
+	domain "github.com/Jehm09/Android-Queries/server/repository"
 	"github.com/gorilla/mux"
 )
 
 type api struct {
-	router     http.Handler
-	repository domain.DomainRepo
+	router http.Handler
 }
 
 type Server interface {
@@ -50,7 +49,7 @@ func (a *api) Router() http.Handler {
 func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	gopher, err := a.repository.FetchGopherByID(vars["ID"])
+	domainA := domain.GetDomain(vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
