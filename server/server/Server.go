@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	domain "github.com/Jehm09/Android-Queries/server/repository"
 	"github.com/gorilla/mux"
 )
 
@@ -25,11 +24,11 @@ func New() Server {
 	//Domain methods get
 
 	// r.HandleFunc("/domain", a.getDomains).Methods(http.MethodGet)
-	r.HandleFunc("/domain/{ID:[a-zA-Z0-9_]+}", a.getDomain).Methods(http.MethodGet)
+	r.HandleFunc("/domain/{ID}", a.getDomain).Methods(http.MethodGet)
 
 	//Histroy methods get
 
-	r.HandleFunc("/history", a.getHistory).Methods(http.MethodGet)
+	// r.HandleFunc("/history", a.getHistory).Methods(http.MethodGet)
 
 	a.router = r
 	return a
@@ -49,13 +48,13 @@ func (a *api) Router() http.Handler {
 func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	domainA := domain.GetDomain(vars["ID"])
+	// respose := asd(vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
-		json.NewEncoder(w).Encode("Gopher Not found")
-		return
-	}
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
+	// 	json.NewEncoder(w).Encode("Gopher Not found")
+	// 	return
+	// }
 
-	json.NewEncoder(w).Encode(gopher)
+	json.NewEncoder(w).Encode(respose)
 }

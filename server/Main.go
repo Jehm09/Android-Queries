@@ -1,14 +1,14 @@
 package main
 
-// import (
-// 	"log"
-// 	"net/http"
+import (
+	"log"
+	"net/http"
 
-// 	"./server"
-// )
+	"./server"
+)
 
-// func main() {
-// 	s := server.New()
+func main() {
+	s := server.New()
 
-// 	log.Fatal(http.ListenAndServe(":808s0", s.Router()))
-// }
+	log.Fatal(http.ListenAndServe(":8080", s.Router()))
+}
