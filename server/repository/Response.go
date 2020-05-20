@@ -1,100 +1,49 @@
 package repository
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
-	"sort"
-	"strings"
+	"net/http"
 
-	"github.com/likexian/whois-go"
+	"github.com/Jehm09/Android-Queries/server/model"
 )
 
-// const SSL_DEFAULT = "-"
-// const LINE_OWNER = 41
-// const LINE_COUNTRY = 47
+//This API gives us information about the domain, its servers and the ssl grade of each server
+const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 
-type DomainAPI struct {
-	Host      string      `json:"host"`
-	Endpoints []ServerAPI `json:"endpoints"`
-	Erros     []ErrorsAPI `json:"errors"`
+type ActualData struct {
+	History *model.History
+	Domain  *model.Domain
 }
 
-type ServerAPI struct {
-	IPAddress string `json:"ipAddress"`
-	Grade     string `json:"grade"`
+func NewActualData(history *model.History, domain *model.Domain) *ActualData {
+	return &ActualData{History: history, Domain: domain}
 }
 
-type ErrorsAPI struct {
-	Message string `json:"message"`
-}
+func GetDomain(host string, actualData *ActualData) *model.Domain {
+	response, err := http.Get(API_DOMAINS_URL + host)
 
-//https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide
-var sslGrades = []string{"A", "A+", "B", "C", "D", "E", "F"}
+	if err != nil {
+		log.Fatal(err.Error())
+		// os.Exit(1)
+	}
 
-// Return the owner and country using whois(ip)
-func (d *DomainAPI) WhoisServerAttributes() (string, string) {
-	result, err := whois.Whois(d.Host)
+	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	owner, country := splitWhois(result)
-	return owner, country
+
+	var domainA DomainAPI
+	json.Unmarshal([]byte(responseData), &domainA)
+
+	return &domainA
 }
 
-// Find owner and country in the text that return whois(ip)
-func splitWhois(response string) (string, string) {
+func createDomain(domainA DomainAPI, actualData *ActualData) *models.Domain {
+	// result := &models.Domain{}
+	if actualData.History != nil {
 
-	var owner, country string
-	dataOwner := (strings.Split(response, "Name:"))
-	dataCountry := (strings.Split(response, "Country:"))
-
-	if len(dataOwner) > 1 {
-		dataOwner = (strings.Split(dataOwner[1], "\n"))
-		owner = strings.Trim(dataOwner[0], " ")
 	}
 
-	if len(dataCountry) > 1 {
-		dataCountry = strings.Split(dataCountry[1], "\n")
-		country = strings.Trim(dataCountry[0], " ")
-	}
-
-	return owner, country
-}
-
-// Seach minor grade in all servers
-func (d *DomainAPI) searchMinorGrade() string {
-	servers := d.Endpoints
-
-	// Is there are no servers
-	if len(servers) < 1 {
-		// return SSL_DEFAULT
-		return ""
-	}
-
-	minor := servers[0].Grade
-
-	for _, server := range servers {
-		// 	grades := strings.Split(servers.SslGrade, "")
-
-		// if len(servers) <= 0 {
-		// 	return SSL_DEFAULT
-		// }
-		grade := server.Grade
-
-		// indice Temporal
-		iT := sort.SearchStrings(sslGrades, grade)
-		jT := sort.SearchStrings(sslGrades, minor)
-
-		if iT < len(sslGrades) && sslGrades[iT] == grade {
-			// if grade != SSL_DEFAULT {
-
-			// Compare indexes that are ordered
-			if jT >= iT {
-				minor = grade
-			}
-
-			// }
-		}
-	}
-
-	return minor
 }
