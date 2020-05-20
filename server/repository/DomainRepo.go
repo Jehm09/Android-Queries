@@ -14,6 +14,7 @@ import (
 
 type DomainAPI struct {
 	Host      string      `json:"host"`
+	Protocol  string      `json:protocol`
 	Endpoints []ServerAPI `json:"endpoints"`
 	Erros     []ErrorsAPI `json:"errors"`
 }
@@ -61,7 +62,7 @@ func splitWhois(response string) (string, string) {
 }
 
 // Seach minor grade in all servers
-func (d *DomainAPI) searchMinorGrade() string {
+func (d *DomainAPI) SearchMinorGrade() string {
 	servers := d.Endpoints
 
 	// Is there are no servers
