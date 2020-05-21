@@ -48,7 +48,7 @@ func (a *api) Router() http.Handler {
 func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	// respose := asd(vars["ID"])
+	// respose := (vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
 	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity

@@ -45,17 +45,18 @@ func GetDomain(host string, history *model.History) *model.Domain {
 
 func CreateDomain(domainA DomainAPI, history *model.History) *model.Domain {
 	// result := &models.Domain{}
-	if history != nil {
+
+	// Agrego al historial si no existe la busqueda
+	if !history.Exists(domainA.Host) {
 		history.Items = append(history.Items, domainA.Host)
-	} else {
-		// var items []string
-		// history = &models.History{items}
 	}
 
 	// Metodo que consulte si existe en la base de datos
 
 	// si no existe se crea el primero
-	var domainResults model.Domain
+
+	// Creo un dominio
+	domainResults := model.Domain{Servers: make([]model.Server, 0, 100)}
 
 	// Si el servidor esta caido
 	if len(domainA.Erros) > 0 {
@@ -68,9 +69,22 @@ func CreateDomain(domainA DomainAPI, history *model.History) *model.Domain {
 		domainResults.IsDown = false
 		domainResults.Title, domainResults.Logo = GetPageInfo(FullUrl)
 		timeActual := time.Now()
+		CreateServersOfDomain(domainA, &domainResults)
 		// domainResults.Time = time.Now()
 	}
 
+	return &domainResults
+}
+
+func CreateServersOfDomain(domainA DomainAPI, domain *model.Domain) {
+	owner, country := domainA.WhoisServerAttributes()
+
+	for _, servers := range domainA.Endpoints {
+		address := servers.IPAddress
+		sslGrade := servers.Grade
+		temServer := model.Server{address, sslGrade, country, owner}
+		domain.Servers = append(domain.Servers, temServer)
+	}
 }
 
 func GetPageInfo(url string) (string, string) {
