@@ -21,7 +21,7 @@ func NewHistoyRepository(db *sql.DB) historyRepo {
 func (r domainRepo) CreateHistory(hostname string) error {
 	sqlQuery := `INSERT INTO androidqueries.history (host) 
 	VALUES ($1)`
-	_, err := r.db.Exec(sqlQuery, d.Host, d.SslGrade, d.PreviousSslGrade)
+	_, err := r.db.Exec(sqlQuery, hostname)
 	if err != nil {
 		return err
 	}
