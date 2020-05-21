@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/Jehm09/Android-Queries/server/model"
 	"github.com/badoux/goscraper"
@@ -40,14 +39,14 @@ func GetDomain(host string, history *model.History) *model.Domain {
 	var domainA DomainAPI
 	json.Unmarshal([]byte(responseData), &domainA)
 
-	return CreateDomain(domainA, history)
+	return createDomain(domainA, history)
 }
 
-func CreateDomain(domainA DomainAPI, history *model.History) *model.Domain {
+func createDomain(domainA DomainAPI, history *model.History) *model.Domain {
 	// result := &models.Domain{}
 
 	// Agrego al historial si no existe la busqueda
-	if !history.Exists(domainA.Host) {
+	if !history.Exist(domainA.Host) {
 		history.Items = append(history.Items, domainA.Host)
 	}
 
@@ -67,16 +66,17 @@ func CreateDomain(domainA DomainAPI, history *model.History) *model.Domain {
 		domainResults.SslGrade = domainA.SearchMinorGrade()
 		domainResults.PreviousSslGrade = ""
 		domainResults.IsDown = false
-		domainResults.Title, domainResults.Logo = GetPageInfo(FullUrl)
-		timeActual := time.Now()
-		CreateServersOfDomain(domainA, &domainResults)
+		domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
+		// timeActual := time.Now()
+		createServersOfDomain(domainA, &domainResults)
 		// domainResults.Time = time.Now()
 	}
 
 	return &domainResults
 }
 
-func CreateServersOfDomain(domainA DomainAPI, domain *model.Domain) {
+//Crea los servidores
+func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 	owner, country := domainA.WhoisServerAttributes()
 
 	for _, servers := range domainA.Endpoints {
@@ -87,7 +87,8 @@ func CreateServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 	}
 }
 
-func GetPageInfo(url string) (string, string) {
+// Obteiene el titulo y el logo de la pagina
+func getPageInfo(url string) (string, string) {
 	s, err := goscraper.Scrape(url, 5)
 	if err != nil {
 		log.Println(err)

@@ -14,7 +14,7 @@ import (
 
 type DomainAPI struct {
 	Host      string      `json:"host"`
-	Protocol  string      `json:protocol`
+	Protocol  string      `json:"protocol"`
 	Endpoints []ServerAPI `json:"endpoints"`
 	Erros     []ErrorsAPI `json:"errors"`
 }

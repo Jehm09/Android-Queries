@@ -1,0 +1,9 @@
+cockroach start-single-node --insecure --store=json-test --listen-addr=localhost:26257 --http-addr=localhost:8080 
+
+
+./cockroach.exe sql --insecure --host=localhost:26257
+CREATE USER IF NOT EXISTS joe;
+CREATE DATABASE androidqueries;
+GRANT ALL ON DATABASE androidqueries TO joe;
+CREATE TABLE IF NOT EXISTS domain (host STRING PRIMARY KEY, sslGrade STRING, sslPreviousGrade STRING, lastSearch TIMESTAMPTZ);
+CREATE TABLE IF NOT EXISTS history (host STRING PRIMARY KEY);

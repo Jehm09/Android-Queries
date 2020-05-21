@@ -1,9 +1,12 @@
-package server
+package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
+	repo "./repository"
+	"github.com/Jehm09/Android-Queries/server/model"
 	"github.com/gorilla/mux"
 )
 
@@ -24,7 +27,7 @@ func New() Server {
 	//Domain methods get
 
 	// r.HandleFunc("/domain", a.getDomains).Methods(http.MethodGet)
-	r.HandleFunc("/domain/{ID}", a.getDomain).Methods(http.MethodGet)
+	r.HandleFunc("/domain/{value}", a.getDomain).Methods(http.MethodGet)
 
 	//Histroy methods get
 
@@ -48,7 +51,10 @@ func (a *api) Router() http.Handler {
 func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	// respose := (vars["ID"])
+	URLID := vars["value"]
+	history := model.History{Items: make([]string, 0, 100)}
+
+	domain := repo.GetDomain(URLID, &history)
 	w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
 	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
@@ -56,5 +62,12 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	json.NewEncoder(w).Encode(respose)
+	json.NewEncoder(w).Encode(domain)
+}
+
+//Main
+func main() {
+	s := New()
+
+	log.Fatal(http.ListenAndServe(":8070", s.Router()))
 }
