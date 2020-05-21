@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 
+	database "github.com/Jehm09/Android-Queries/server/database"
 	"github.com/Jehm09/Android-Queries/server/model"
 	"github.com/badoux/goscraper"
 )
@@ -23,7 +25,7 @@ const PREFIX_URL = "://www."
 // 	return &ActualData{History: history, Domain: domain}
 // }
 
-func GetDomain(host string, history *model.History) *model.Domain {
+func GetDomain(host string, db *sql.DB) *model.Domain {
 	response, err := http.Get(API_DOMAINS_URL + host)
 
 	if err != nil {
@@ -39,16 +41,15 @@ func GetDomain(host string, history *model.History) *model.Domain {
 	var domainA DomainAPI
 	json.Unmarshal([]byte(responseData), &domainA)
 
-	return createDomain(domainA, history)
+	return createDomain(domainA, &db)
 }
 
-func createDomain(domainA DomainAPI, history *model.History) *model.Domain {
+func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	// result := &models.Domain{}
 
-	// Agrego al historial si no existe la busqueda
-	if !history.Exist(domainA.Host) {
-		history.Items = append(history.Items, domainA.Host)
-	}
+	// Agrego al historial el hostname
+	historyRepo := database.NewHistoyRepository(db)
+	err: := historyRepo.CreateHistory(domainA.Host)
 
 	// Metodo que consulte si existe en la base de datos
 

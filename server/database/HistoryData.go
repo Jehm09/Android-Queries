@@ -5,10 +5,6 @@ import (
 	"log"
 )
 
-type HistoryDB struct {
-	Items []string
-}
-
 type historyRepo struct {
 	db *sql.DB
 }
@@ -18,7 +14,7 @@ func NewHistoyRepository(db *sql.DB) historyRepo {
 	return historyRepo{db: db}
 }
 
-func (r domainRepo) CreateHistory(hostname string) error {
+func (r historyRepo) CreateHistory(hostname string) error {
 	sqlQuery := `INSERT INTO androidqueries.history (host) 
 	VALUES ($1)`
 	_, err := r.db.Exec(sqlQuery, hostname)
@@ -28,7 +24,7 @@ func (r domainRepo) CreateHistory(hostname string) error {
 	return nil
 }
 
-func (r domainRepo) FetchHistory() (*HistoryDB, error) {
+func (r historyRepo) FetchHistory() ([]string, error) {
 	sqlQuery := `SELECT host FROM androidqueries.history`
 
 	rows, err := r.db.Query(sqlQuery)
@@ -48,5 +44,5 @@ func (r domainRepo) FetchHistory() (*HistoryDB, error) {
 		items = append(items, host)
 	}
 
-	return &HistoryDB{Items: items}, nil
+	return items, nil
 }

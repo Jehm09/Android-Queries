@@ -8,7 +8,6 @@ import (
 
 	conec "./database"
 	repo "./repository"
-	"github.com/Jehm09/Android-Queries/server/model"
 	"github.com/gorilla/mux"
 )
 
@@ -53,10 +52,9 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	URLID := vars["value"]
-	history := model.History{Items: make([]string, 0, 100)}
 
-	domain := repo.GetDomain(URLID, &history)
-	w.Header().Set("Content-Type", "application/json")
+	domain := repo.GetDomain(URLID, &a.db)
+	// w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
 	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
 	// 	json.NewEncoder(w).Encode("Gopher Not found")
@@ -67,20 +65,16 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	history := repo.GetHistory(&a.db)
 
-	URLID := vars["value"]
-	history := model.History{Items: make([]string, 0, 100)}
-
-	domain := repo.GetDomain(URLID, &history)
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
 	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
 	// 	json.NewEncoder(w).Encode("Gopher Not found")
 	// 	return
 	// }
 
-	json.NewEncoder(w).Encode(domain)
+	json.NewEncoder(w).Encode(history)
 }
 
 //Main
