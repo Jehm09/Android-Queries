@@ -85,7 +85,10 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			//actualizo en la base de datos
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, domainResults.PreviousSslGrade, time.Now()}
 			// Error si no guarda
-			err := domainRepo.UpdateDomain(&domainResults)
+			err := domainRepo.UpdateDomain(&domainData)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
 	} else {
@@ -104,6 +107,9 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, "-", time.Now()}
 			// Error si no guarda
 			err := domainRepo.CreateDomain(&domainData)
+			if err != nil {
+				log.Fatal(err)
+			}
 			// Creo servidores
 			createServersOfDomain(domainA, &domainResults)
 		}

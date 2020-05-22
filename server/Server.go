@@ -53,7 +53,7 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 
 	URLID := vars["value"]
 
-	domain := repo.GetDomain(URLID, &a.db)
+	domain := repo.GetDomain(URLID, a.db)
 	// w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
 	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
@@ -65,7 +65,7 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
-	history := repo.GetHistory(&a.db)
+	history := repo.GetHistory(a.db)
 
 	// w.Header().Set("Content-Type", "application/json")
 	// if err != nil {
