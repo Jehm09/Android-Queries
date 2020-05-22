@@ -15,7 +15,7 @@ func NewHistoyRepository(db *sql.DB) historyRepo {
 }
 
 func (r historyRepo) CreateHistory(hostname string) error {
-	sqlExec := `INSERT INTO androidqueries.history host = $1`
+	sqlExec := `INSERT INTO androidqueries.history  (host) VALUES ($1)`
 	_, err := r.db.Exec(sqlExec, hostname)
 	if err != nil {
 		return err
