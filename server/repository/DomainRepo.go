@@ -8,7 +8,8 @@ import (
 	"github.com/likexian/whois-go"
 )
 
-// const SSL_DEFAULT = "-"
+const SSL_DEFAULT = "-"
+
 // const LINE_OWNER = 41
 // const LINE_COUNTRY = 47
 
@@ -68,7 +69,7 @@ func (d *DomainAPI) SearchMinorGrade() string {
 	// Is there are no servers
 	if len(servers) < 1 {
 		// return SSL_DEFAULT
-		return ""
+		return SSL_DEFAULT
 	}
 
 	minor := servers[0].Grade

@@ -17,6 +17,7 @@ import (
 //This API gives us information about the domain, its servers and the ssl grade of each server
 const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 const PREFIX_URL = "://www."
+const DEFAUlT_GRADE = "-"
 
 // type ActualData struct {
 // 	History *model.History
@@ -50,11 +51,11 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	// result := &models.Domain{}
 
 	// Se crean las variables para poder consultar la base de datos
-	historyRepo := database.NewHistoyRepository(db)
-	domainRepo := database.NewDomainRepository(db)
+	historyDb := database.NewHistoyRepository(db)
+	domainDb := database.NewDomainRepository(db)
 
 	// Agrego al historial el hostname
-	err := historyRepo.CreateHistory(domainA.Host)
+	err := historyDb.CreateHistory(domainA.Host)
 
 	// Ocurrio un error al agregar el hostname al historial
 	if err != nil {
@@ -62,7 +63,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	}
 
 	// Metodo que consulte si existe en la base de datos
-	domainExists, err := domainRepo.FetchDomain(domainA.Host)
+	domainExists, err := domainDb.FetchDomain(domainA.Host)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -89,7 +90,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			//actualizo en la base de datos
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, domainResults.PreviousSslGrade, time.Now()}
 			// Error si no guarda
-			err := domainRepo.UpdateDomain(&domainData)
+			err := domainDb.UpdateDomain(&domainData)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -110,9 +111,8 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			//Guardo en la base de datos
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, "-", time.Now()}
 			// Error si no guarda
-			err := domainRepo.CreateDomain(&domainData)
+			err := domainDb.CreateDomain(&domainData)
 			if err != nil {
-				fmt.Println("AQUIIERRO")
 				log.Fatal(err)
 			}
 			// Creo servidores
@@ -122,6 +122,10 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 
 	return &domainResults
 }
+
+// func updateDomainDB(domainA DomainAPI, domainDb *database.domainRepo) {
+
+// }
 
 //Crea los servidores
 func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
@@ -136,9 +140,9 @@ func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 }
 
 // Mira si ya paso una hora
-func CompareOneHourBefore(last_search time.Time) bool {
+func CompareOneHourBefore(lastSearch time.Time) bool {
 	today := time.Now()
-	comparator := last_search.Add(1 * time.Hour)
+	comparator := lastSearch.Add(1 * time.Hour)
 	if today.Before(comparator) {
 		return false
 	} else {

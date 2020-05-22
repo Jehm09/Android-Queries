@@ -3,6 +3,6 @@ package model
 type Server struct {
 	Address  string `json:"address"`
 	SslGrade string `json:"ssl_grade"`
-	Contry   string `json:"contry"`
+	Country  string `json:"country"`
 	Owner    string `json:"owner"`
 }

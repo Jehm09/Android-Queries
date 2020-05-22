@@ -81,5 +81,5 @@ func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
 func main() {
 	s := New()
 
-	log.Fatal(http.ListenAndServe(":8070", s.Router()))
+	log.Fatal(http.ListenAndServe("192.168.0.15:8070", s.Router()))
 }
