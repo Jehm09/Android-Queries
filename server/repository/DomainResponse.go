@@ -63,6 +63,9 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 
 	// Metodo que consulte si existe en la base de datos
 	domainExists, err := domainRepo.FetchDomain(domainA.Host)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// Creo un dominio
 	domainResults := model.Domain{Servers: make([]model.Server, 0, 100)}
@@ -109,6 +112,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			// Error si no guarda
 			err := domainRepo.CreateDomain(&domainData)
 			if err != nil {
+				fmt.Println("AQUIIERRO")
 				log.Fatal(err)
 			}
 			// Creo servidores
