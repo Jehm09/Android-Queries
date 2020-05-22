@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	database "github.com/Jehm09/Android-Queries/server/database"
 	"github.com/Jehm09/Android-Queries/server/model"
@@ -41,36 +42,71 @@ func GetDomain(host string, db *sql.DB) *model.Domain {
 	var domainA DomainAPI
 	json.Unmarshal([]byte(responseData), &domainA)
 
-	return createDomain(domainA, &db)
+	return createDomain(domainA, db)
 }
 
 func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	// result := &models.Domain{}
 
-	// Agrego al historial el hostname
+	// Se crean las variables para poder consultar la base de datos
 	historyRepo := database.NewHistoyRepository(db)
-	err: := historyRepo.CreateHistory(domainA.Host)
+	domainRepo := database.NewDomainRepository(db)
+
+	// Agrego al historial el hostname
+	err := historyRepo.CreateHistory(domainA.Host)
+
+	// Ocurrio un error al agregar el hostname al historial
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Metodo que consulte si existe en la base de datos
-
-	// si no existe se crea el primero
+	domainExists, err := domainRepo.FetchDomain(domainA.Host)
 
 	// Creo un dominio
 	domainResults := model.Domain{Servers: make([]model.Server, 0, 100)}
 
-	// Si el servidor esta caido
-	if len(domainA.Erros) > 0 {
-		domainResults.IsDown = true
+	// El dominio ya estaba en la base de datos
+	if domainExists != nil {
+		// Si el servidor esta caido
+		if len(domainA.Erros) > 0 {
+			domainResults.IsDown = true
+		} else {
+			FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
+			// Si paso una hora
+			domainResults.SslGrade = domainA.SearchMinorGrade()
+			domainResults.ServersChanged = domainResults.SslGrade != domainExists.SslGrade
+			// Si paso una hora
+			domainResults.PreviousSslGrade = domainExists.SslGrade
+			domainResults.IsDown = false
+			domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
+			createServersOfDomain(domainA, &domainResults)
+
+			//actualizo en la base de datos
+			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, domainResults.PreviousSslGrade, time.Now()}
+			// Error si no guarda
+			err := domainRepo.UpdateDomain(&domainResults)
+		}
+
 	} else {
-		FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
-		domainResults.ServersChanged = false
-		domainResults.SslGrade = domainA.SearchMinorGrade()
-		domainResults.PreviousSslGrade = ""
-		domainResults.IsDown = false
-		domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
-		// timeActual := time.Now()
-		createServersOfDomain(domainA, &domainResults)
-		// domainResults.Time = time.Now()
+		// No existia en la base de datos
+		if len(domainA.Erros) > 0 {
+			domainResults.IsDown = true
+		} else {
+			FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
+			domainResults.ServersChanged = false
+			domainResults.SslGrade = domainA.SearchMinorGrade()
+			domainResults.PreviousSslGrade = "-"
+			domainResults.IsDown = false
+			domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
+
+			//Guardo en la base de datos
+			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, "-", time.Now()}
+			// Error si no guarda
+			err := domainRepo.CreateDomain(&domainData)
+			// Creo servidores
+			createServersOfDomain(domainA, &domainResults)
+		}
 	}
 
 	return &domainResults
@@ -85,6 +121,17 @@ func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 		sslGrade := servers.Grade
 		temServer := model.Server{address, sslGrade, country, owner}
 		domain.Servers = append(domain.Servers, temServer)
+	}
+}
+
+// Mira si ya paso una hora
+func CompareOneHourBefore(last_search time.Time) bool {
+	today := time.Now()
+	comparator := last_search.Add(1 * time.Hour)
+	if today.Before(comparator) {
+		return false
+	} else {
+		return true
 	}
 }
 
