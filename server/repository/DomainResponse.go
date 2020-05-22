@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,7 +58,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 
 	// Ocurrio un error al agregar el hostname al historial
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	// Metodo que consulte si existe en la base de datos

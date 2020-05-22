@@ -23,7 +23,7 @@ func NewDomainRepository(db *sql.DB) domainRepo {
 }
 
 func (r domainRepo) CreateDomain(d *DomainDB) error {
-	sqlQuery := `INSERT INTO androidqueries.domain (host, sslgrade, sslpreviusgrade, lastsearch) 
+	sqlQuery := `INSERT INTO androidqueries.domain (host, sslgrade, sslpreviousgrade, lastsearch) 
 	VALUES ($1, $2, $3, NOW())`
 	_, err := r.db.Exec(sqlQuery, d.Host, d.SslGrade, d.PreviousSslGrade)
 	if err != nil {
