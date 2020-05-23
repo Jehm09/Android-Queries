@@ -4,36 +4,36 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
-	"net/http"
 
 	conec "./database"
 	repo "./repository"
-	"github.com/gorilla/mux"
+	"github.com/buaazp/fasthttprouter"
+	"github.com/valyala/fasthttp"
 )
 
 const ADDRESS = "192.168.0.15"
 const PORT = "8070"
 
 type api struct {
-	router http.Handler
+	router *fasthttprouter.Router
 	db     *sql.DB
 }
 
 type Server interface {
-	Router() http.Handler
+	Router() *fasthttprouter.Router
 }
 
 // Create router
 func New() Server {
 	a := &api{}
 
-	r := mux.NewRouter()
+	r := fasthttprouter.New()
 
 	//Domain methods get
-	r.HandleFunc("/domain/{value}", a.getDomain).Methods(http.MethodGet)
+	r.GET("/domain", a.getDomain)
 
 	// Histroy methods get
-	r.HandleFunc("/history", a.getHistory).Methods(http.MethodGet)
+	r.GET("/history", a.getHistory)
 
 	db, err := conec.GetConnectionDB()
 	if err != nil {
@@ -42,27 +42,45 @@ func New() Server {
 
 	a.router = r
 	a.db = db
+
 	return a
 }
 
-func (a *api) Router() http.Handler {
+func (a *api) Router() *fasthttprouter.Router {
 	return a.router
 }
 
-func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+// localhost:8070/domain?hostname=x
+func (a *api) getDomain(ctx *fasthttp.RequestCtx) {
+	nameByte := ctx.QueryArgs().Peek("hostname")
 
-	URLID := vars["value"]
+	hostName := string(nameByte)
 
-	domain := repo.GetDomain(URLID, a.db)
+	domain := repo.GetDomain(hostName, a.db)
 
-	json.NewEncoder(w).Encode(domain)
+	jsonBody, err := json.Marshal(domain)
+
+	if err != nil {
+		ctx.Error(" json marshal fail", 500)
+		return
+	}
+
+	ctx.Response.SetBody(jsonBody)
+
+	// json.NewEncoder(w).Encode(domain)
 }
 
-func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
+func (a *api) getHistory(ctx *fasthttp.RequestCtx) {
 	history := repo.GetHistory(a.db)
 
-	json.NewEncoder(w).Encode(history)
+	jsonBody, err := json.Marshal(history)
+
+	if err != nil {
+		ctx.Error(" json marshal fail", 500)
+		return
+	}
+
+	ctx.Response.SetBody(jsonBody)
 }
 
 //Main
@@ -70,5 +88,5 @@ func main() {
 	s := New()
 
 	serverListener := (ADDRESS + ":" + PORT)
-	log.Fatal(http.ListenAndServe(serverListener, s.Router()))
+	log.Fatal(fasthttp.ListenAndServe(serverListener, s.Router().Handler))
 }

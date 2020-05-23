@@ -50,20 +50,20 @@
         android:id="@+id/isDownTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Is down"
-        app:layout_constraintStart_toEndOf="@+id/titleTV"
-        app:layout_constraintTop_toBottomOf="@+id/hostNamePT" />
+        app:layout_constraintStart_toEndOf="@+id/logoIV"
+        app:layout_constraintTop_toBottomOf="@+id/previousSslTV" />
 
     <TextView
         android:id="@+id/serverChangedTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Servers Changed"
-        app:layout_constraintStart_toEndOf="@+id/sslGradeTV"
+        app:layout_constraintStart_toEndOf="@+id/logoIV"
         app:layout_constraintTop_toBottomOf="@+id/isDownTV" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -82,10 +82,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="Servers"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoIV" />
+        app:layout_constraintTop_toBottomOf="@+id/serverChangedTV" />
 
     <EditText
         android:id="@+id/hostNamePT"
@@ -96,7 +96,6 @@
         android:ems="10"
         android:hint="Host Name"
         android:inputType="textPersonName"
-        android:text="google.com"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

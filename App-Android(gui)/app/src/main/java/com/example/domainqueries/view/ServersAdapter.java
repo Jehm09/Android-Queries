@@ -13,7 +13,7 @@ import com.example.domainqueries.model.Server;
 
 public class ServersAdapter extends RecyclerView.Adapter<ServersAdapter.ViewHolderData> {
 
-    private Server []servers;
+    private Server[] servers;
 
     public ServersAdapter(Server[] servers) {
         this.servers = servers;
@@ -38,7 +38,7 @@ public class ServersAdapter extends RecyclerView.Adapter<ServersAdapter.ViewHold
 
     public class ViewHolderData extends RecyclerView.ViewHolder {
 
-        private TextView addressTV,sslGradeTV, countryTV, ownerTV;
+        private TextView addressTV, sslGradeTV, countryTV, ownerTV;
 
         public ViewHolderData(@NonNull View itemView) {
             super(itemView);
@@ -50,10 +50,10 @@ public class ServersAdapter extends RecyclerView.Adapter<ServersAdapter.ViewHold
         }
 
         public void setData(Server server) {
-            addressTV.setText(server.getAddress());
-            sslGradeTV.setText(server.getSsl_grade());
-            countryTV.setText(server.getCountry());
-            ownerTV.setText(server.getOwner());
+            addressTV.setText("Address: " + server.getAddress());
+            sslGradeTV.setText("Ssl Grade: " + server.getSsl_grade());
+            countryTV.setText("Country: " + server.getCountry());
+            ownerTV.setText("Owner: " + server.getOwner());
         }
     }
 }
