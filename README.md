@@ -10,8 +10,10 @@ CREATE DATABASE androidqueries;
 SET DATABASE = androidqueries
 CREATE TABLE IF NOT EXISTS domain (host STRING PRIMARY KEY, sslGrade STRING, sslPreviousGrade STRING, lastSearch TIMESTAMPTZ);
 CREATE TABLE IF NOT EXISTS history (host STRING PRIMARY KEY);
- GRANT ALL ON TABLE androidqueries.* TO test;
+GRANT ALL ON TABLE androidqueries.* TO test;
 
 Import the go packages to be able to run the go run ./Server.go
 
 Install the apk in the cell phone to have the user interface
+
+The server is running on port 8070 and the machine's ip address in order to use it on different devices, you must change the ADDRESS and PORT constants found in server/server.go line 14 and 15, for proper operation.
