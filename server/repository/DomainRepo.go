@@ -33,8 +33,8 @@ type ErrorsAPI struct {
 var sslGrades = []string{"A", "A+", "B", "C", "D", "E", "F"}
 
 // Return the owner and country using whois(ip)
-func (d *DomainAPI) WhoisServerAttributes() (string, string) {
-	result, err := whois.Whois(d.Host)
+func (d *DomainAPI) WhoisServerAttributes(hostName string) (string, string) {
+	result, err := whois.Whois(hostName)
 	if err != nil {
 		log.Fatal(err)
 	}

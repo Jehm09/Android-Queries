@@ -17,7 +17,7 @@ import (
 //This API gives us information about the domain, its servers and the ssl grade of each server
 const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 const PREFIX_URL = "://www."
-const DEFAUlT_GRADE = "-"
+const DEFAULT_GRADE = "-"
 
 // type ActualData struct {
 // 	History *model.History
@@ -75,20 +75,25 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	if domainExists != nil {
 		// Si el servidor esta caido
 		if len(domainA.Erros) > 0 {
-			domainResults.IsDown = true
+			domainResults = *newDomain(false, "", "", "", "", true)
 		} else {
 			FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
+			title, logo := getPageInfo(FullUrl)
+
 			// Si paso una hora
-			domainResults.SslGrade = domainA.SearchMinorGrade()
-			domainResults.ServersChanged = domainResults.SslGrade != domainExists.SslGrade
-			// Si paso una hora
-			domainResults.PreviousSslGrade = domainExists.SslGrade
-			domainResults.IsDown = false
-			domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
+			sslGrade, serverChanged, previousSslGrade := DEFAULT_GRADE, false, DEFAULT_GRADE
+			if CompareOneHourBefore(domainExists.LastSearch) {
+				sslGrade = domainA.SearchMinorGrade()
+				serverChanged = sslGrade != domainExists.SslGrade
+				previousSslGrade = domainExists.SslGrade
+			}
+
+			domainResults = *newDomain(serverChanged, sslGrade, previousSslGrade, logo, title, false)
 			createServersOfDomain(domainA, &domainResults)
 
 			//actualizo en la base de datos
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, domainResults.PreviousSslGrade, time.Now()}
+
 			// Error si no guarda
 			err := domainDb.UpdateDomain(&domainData)
 			if err != nil {
@@ -99,14 +104,12 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	} else {
 		// No existia en la base de datos
 		if len(domainA.Erros) > 0 {
-			domainResults.IsDown = true
+			domainResults = *newDomain(false, "", "", "", "", true)
 		} else {
 			FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
-			domainResults.ServersChanged = false
-			domainResults.SslGrade = domainA.SearchMinorGrade()
-			domainResults.PreviousSslGrade = "-"
-			domainResults.IsDown = false
-			domainResults.Title, domainResults.Logo = getPageInfo(FullUrl)
+			title, logo := getPageInfo(FullUrl)
+			minorGrade := domainA.SearchMinorGrade()
+			domainResults = *newDomain(false, minorGrade, DEFAULT_GRADE, logo, title, false)
 
 			//Guardo en la base de datos
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, "-", time.Now()}
@@ -123,16 +126,16 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	return &domainResults
 }
 
-// func updateDomainDB(domainA DomainAPI, domainDb *database.domainRepo) {
-
-// }
+func newDomain(serversChanged bool, sslGrade string, previousSsl string, logo string, title string, isDown bool) *model.Domain {
+	return &model.Domain{ServersChanged: serversChanged, SslGrade: sslGrade, PreviousSslGrade: previousSsl, Title: title, Logo: logo, IsDown: isDown}
+}
 
 //Crea los servidores
 func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
-	owner, country := domainA.WhoisServerAttributes()
 
 	for _, servers := range domainA.Endpoints {
 		address := servers.IPAddress
+		owner, country := domainA.WhoisServerAttributes(address)
 		sslGrade := servers.Grade
 		temServer := model.Server{address, sslGrade, country, owner}
 		domain.Servers = append(domain.Servers, temServer)
