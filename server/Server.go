@@ -32,8 +32,6 @@ func New() Server {
 	// Histroy methods get
 	r.HandleFunc("/history", a.getHistory).Methods(http.MethodGet)
 
-	// r.HandleFunc("/history", a.getHistory).Methods(http.MethodGet)
-
 	db, err := conec.GetConnectionDB()
 	if err != nil {
 		log.Fatal(err)
@@ -54,25 +52,12 @@ func (a *api) getDomain(w http.ResponseWriter, r *http.Request) {
 	URLID := vars["value"]
 
 	domain := repo.GetDomain(URLID, a.db)
-	// w.Header().Set("Content-Type", "application/json")
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
-	// 	json.NewEncoder(w).Encode("Gopher Not found")
-	// 	return
-	// }
 
 	json.NewEncoder(w).Encode(domain)
 }
 
 func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
 	history := repo.GetHistory(a.db)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
-	// 	json.NewEncoder(w).Encode("Gopher Not found")
-	// 	return
-	// }
 
 	json.NewEncoder(w).Encode(history)
 }

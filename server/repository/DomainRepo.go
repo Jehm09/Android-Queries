@@ -75,11 +75,6 @@ func (d *DomainAPI) SearchMinorGrade() string {
 	minor := servers[0].Grade
 
 	for _, server := range servers {
-		// 	grades := strings.Split(servers.SslGrade, "")
-
-		// if len(servers) <= 0 {
-		// 	return SSL_DEFAULT
-		// }
 		grade := server.Grade
 
 		// indice Temporal
@@ -87,14 +82,11 @@ func (d *DomainAPI) SearchMinorGrade() string {
 		jT := sort.SearchStrings(sslGrades, minor)
 
 		if iT < len(sslGrades) && sslGrades[iT] == grade {
-			// if grade != SSL_DEFAULT {
-
 			// Compare indexes that are ordered
 			if jT >= iT {
 				minor = grade
 			}
 
-			// }
 		}
 	}
 

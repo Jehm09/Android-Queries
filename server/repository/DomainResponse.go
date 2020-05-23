@@ -19,21 +19,11 @@ const API_DOMAINS_URL = "https://api.ssllabs.com/api/v3/analyze?host="
 const PREFIX_URL = "://www."
 const DEFAULT_GRADE = "-"
 
-// type ActualData struct {
-// 	History *model.History
-// 	Domain  *model.Domain
-// }
-
-// func NewActualData(history *model.History, domain *model.Domain) *ActualData {
-// 	return &ActualData{History: history, Domain: domain}
-// }
-
 func GetDomain(host string, db *sql.DB) *model.Domain {
 	response, err := http.Get(API_DOMAINS_URL + host)
 
 	if err != nil {
 		log.Fatal(err.Error())
-		// os.Exit(1)
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
@@ -50,37 +40,36 @@ func GetDomain(host string, db *sql.DB) *model.Domain {
 func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	// result := &models.Domain{}
 
-	// Se crean las variables para poder consultar la base de datos
 	historyDb := database.NewHistoyRepository(db)
 	domainDb := database.NewDomainRepository(db)
 
-	// Agrego al historial el hostname
+	// Add hostname to history
 	err := historyDb.CreateHistory(domainA.Host)
 
-	// Ocurrio un error al agregar el hostname al historial
+	// Error to put hostname in the database
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// Metodo que consulte si existe en la base de datos
+	// Get the domain of the database with that host of consult
 	domainExists, err := domainDb.FetchDomain(domainA.Host)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// Creo un dominio
+	// Created a domain that goin to return
 	domainResults := model.Domain{Servers: make([]model.Server, 0, 100)}
 
-	// El dominio ya estaba en la base de datos
+	// The domain exists in the databas
 	if domainExists != nil {
-		// Si el servidor esta caido
+		// The api rest api.ssllabs.com can not get results
 		if len(domainA.Erros) > 0 {
 			domainResults = *newDomain(false, "", "", "", "", true)
 		} else {
 			FullUrl := domainA.Protocol + PREFIX_URL + domainA.Host
 			title, logo := getPageInfo(FullUrl)
 
-			// Si paso una hora
+			// If it's been an hour
 			sslGrade, serverChanged, previousSslGrade := DEFAULT_GRADE, false, DEFAULT_GRADE
 			if CompareOneHourBefore(domainExists.LastSearch) {
 				sslGrade = domainA.SearchMinorGrade()
@@ -91,10 +80,10 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			domainResults = *newDomain(serverChanged, sslGrade, previousSslGrade, logo, title, false)
 			createServersOfDomain(domainA, &domainResults)
 
-			//actualizo en la base de datos
+			// Update the domain on the database
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, domainResults.PreviousSslGrade, time.Now()}
 
-			// Error si no guarda
+			// Error, in case the database can't save
 			err := domainDb.UpdateDomain(&domainData)
 			if err != nil {
 				log.Fatal(err)
@@ -102,7 +91,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 		}
 
 	} else {
-		// No existia en la base de datos
+		// The host does exists in database
 		if len(domainA.Erros) > 0 {
 			domainResults = *newDomain(false, "", "", "", "", true)
 		} else {
@@ -111,18 +100,19 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			minorGrade := domainA.SearchMinorGrade()
 			domainResults = *newDomain(false, minorGrade, DEFAULT_GRADE, logo, title, false)
 
-			//Guardo en la base de datos
+			// Create a variable domainData
 			domainData := database.DomainDB{domainA.Host, domainResults.SslGrade, "-", time.Now()}
-			// Error si no guarda
+			// Error, in case the database can't save
 			err := domainDb.CreateDomain(&domainData)
 			if err != nil {
 				log.Fatal(err)
 			}
-			// Creo servidores
+			// I add the servers to domainResults
 			createServersOfDomain(domainA, &domainResults)
 		}
 	}
 
+	// Return domainResults
 	return &domainResults
 }
 
@@ -130,7 +120,7 @@ func newDomain(serversChanged bool, sslGrade string, previousSsl string, logo st
 	return &model.Domain{ServersChanged: serversChanged, SslGrade: sslGrade, PreviousSslGrade: previousSsl, Title: title, Logo: logo, IsDown: isDown}
 }
 
-//Crea los servidores
+//Created the servers of a domain
 func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 
 	for _, servers := range domainA.Endpoints {
@@ -142,7 +132,7 @@ func createServersOfDomain(domainA DomainAPI, domain *model.Domain) {
 	}
 }
 
-// Mira si ya paso una hora
+// If it's been an hour
 func CompareOneHourBefore(lastSearch time.Time) bool {
 	today := time.Now()
 	comparator := lastSearch.Add(1 * time.Hour)
@@ -153,7 +143,7 @@ func CompareOneHourBefore(lastSearch time.Time) bool {
 	}
 }
 
-// Obteiene el titulo y el logo de la pagina
+// Get logo and title of a url
 func getPageInfo(url string) (string, string) {
 	s, err := goscraper.Scrape(url, 5)
 	if err != nil {
