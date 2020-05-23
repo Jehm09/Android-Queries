@@ -11,7 +11,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-const ADDRESS = "192.168.0.15"
+const ADDRESS = "localhost"
 const PORT = "8070"
 
 type api struct {
