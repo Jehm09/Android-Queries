@@ -52,7 +52,7 @@ public class ServersAdapter extends RecyclerView.Adapter<ServersAdapter.ViewHold
         public void setData(Server server) {
             addressTV.setText(server.getAddress());
             sslGradeTV.setText(server.getSsl_grade());
-            countryTV.setText(server.getCuntry());
+            countryTV.setText(server.getCountry());
             ownerTV.setText(server.getOwner());
         }
     }

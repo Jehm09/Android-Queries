@@ -4,16 +4,16 @@ public class Domain {
     private Server []servers;
     private boolean servers_changed;
     private String ssl_grade;
-    private String previous_grade;
+    private String previous_ssl_grade;
     private String logo;
     private String title;
     private boolean is_down;
 
-    public Domain(Server[] servers, boolean servers_changed, String ssl_grade, String previous_grade, String logo, String title, boolean is_down) {
+    public Domain(Server[] servers, boolean servers_changed, String ssl_grade, String previous_ssl_grade, String logo, String title, boolean is_down) {
         this.servers = servers;
         this.servers_changed = servers_changed;
         this.ssl_grade = ssl_grade;
-        this.previous_grade = previous_grade;
+        this.previous_ssl_grade = previous_ssl_grade;
         this.logo = logo;
         this.title = title;
         this.is_down = is_down;
@@ -47,12 +47,12 @@ public class Domain {
         this.ssl_grade = ssl_grade;
     }
 
-    public String getPrevious_grade() {
-        return previous_grade;
+    public String getPrevious_ssl_grade() {
+        return previous_ssl_grade;
     }
 
-    public void setPrevious_grade(String previous_grade) {
-        this.previous_grade = previous_grade;
+    public void setPrevious_ssl_grade(String previous_ssl_grade) {
+        this.previous_ssl_grade = previous_ssl_grade;
     }
 
     public String getLogo() {

@@ -7,5 +7,5 @@ public class Constants {
 
 
     public static final String URL_DOMAIN = "http://192.168.0.15:8070/domain/";
-    public static final String URL_History = "http://192.168.0.15:8070/History/";
+    public static final String URL_History = "http://192.168.0.15:8070/history";
 }

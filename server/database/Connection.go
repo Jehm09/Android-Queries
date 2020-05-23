@@ -7,7 +7,7 @@ import (
 )
 
 func GetConnectionDB() (*sql.DB, error) {
-	db, err := sql.Open("postgres", "user=admin dbname=androidqueries sslmode=disable port=26257")
+	db, err := sql.Open("postgres", "user=test dbname=androidqueries sslmode=disable port=26257")
 
 	return db, err
 }

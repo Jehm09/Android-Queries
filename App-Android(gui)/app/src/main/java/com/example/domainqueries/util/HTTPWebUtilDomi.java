@@ -26,6 +26,7 @@ public class HTTPWebUtilDomi {
             URL page = new URL(url);
             Log.e(">>>>>>>>>", url);
             HttpURLConnection connection = (HttpURLConnection) page.openConnection();
+            connection.setRequestMethod("GET");
             InputStream is = connection.getInputStream();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];

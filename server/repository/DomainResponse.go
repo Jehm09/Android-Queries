@@ -70,9 +70,8 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 			title, logo := getPageInfo(FullUrl)
 
 			// If it's been an hour
-			sslGrade, serverChanged, previousSslGrade := DEFAULT_GRADE, false, DEFAULT_GRADE
+			sslGrade, serverChanged, previousSslGrade := domainA.SearchMinorGrade(), false, DEFAULT_GRADE
 			if CompareOneHourBefore(domainExists.LastSearch) {
-				sslGrade = domainA.SearchMinorGrade()
 				serverChanged = sslGrade != domainExists.SslGrade
 				previousSslGrade = domainExists.SslGrade
 			}

@@ -40,7 +40,7 @@ public class MainController implements HTTPWebUtilDomi.OnResponseListener, View.
                             Glide.with(mainActivity).load(domain.getLogo()).centerCrop().into(mainActivity.getLogoIV());
                             mainActivity.getTitleTV().setText(domain.getTitle());
                             mainActivity.getSslGradeTV().setText(domain.getSsl_grade());
-                            mainActivity.getPreviousSslTV().setText(domain.getPrevious_grade());
+                            mainActivity.getPreviousSslTV().setText(domain.getPrevious_ssl_grade());
                             mainActivity.getIsDownTV().setText(domain.isIs_down()+"");
                             mainActivity.getServerChangedTV().setText(domain.isServers_changed()+"");
 
@@ -88,7 +88,6 @@ public class MainController implements HTTPWebUtilDomi.OnResponseListener, View.
                 addHistory();
 
                 break;
-
 
         }
     }

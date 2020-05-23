@@ -11,6 +11,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const ADDRESS = "192.168.0.15"
+const PORT = "8070"
+
 type api struct {
 	router http.Handler
 	db     *sql.DB
@@ -66,5 +69,6 @@ func (a *api) getHistory(w http.ResponseWriter, r *http.Request) {
 func main() {
 	s := New()
 
-	log.Fatal(http.ListenAndServe("192.168.0.15:8070", s.Router()))
+	serverListener := (ADDRESS + ":" + PORT)
+	log.Fatal(http.ListenAndServe(serverListener, s.Router()))
 }

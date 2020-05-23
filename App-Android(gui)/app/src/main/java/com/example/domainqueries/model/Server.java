@@ -3,13 +3,13 @@ package com.example.domainqueries.model;
 public class Server {
     private String address;
     private String ssl_grade;
-    private String cuntry;
+    private String country;
     private String owner;
 
-    public Server(String address, String ssl_grade, String cuntry, String owner) {
+    public Server(String address, String ssl_grade, String country, String owner) {
         this.address = address;
         this.ssl_grade = ssl_grade;
-        this.cuntry = cuntry;
+        this.country = country;
         this.owner = owner;
     }
 
@@ -33,12 +33,12 @@ public class Server {
         this.ssl_grade = ssl_grade;
     }
 
-    public String getCuntry() {
-        return cuntry;
+    public String getCountry() {
+        return country;
     }
 
-    public void setCuntry(String cuntry) {
-        this.cuntry = cuntry;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getOwner() {
