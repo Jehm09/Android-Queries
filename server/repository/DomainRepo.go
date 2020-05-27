@@ -10,9 +10,6 @@ import (
 
 const SSL_DEFAULT = "-"
 
-// const LINE_OWNER = 41
-// const LINE_COUNTRY = 47
-
 type DomainAPI struct {
 	Host      string      `json:"host"`
 	Protocol  string      `json:"protocol"`
