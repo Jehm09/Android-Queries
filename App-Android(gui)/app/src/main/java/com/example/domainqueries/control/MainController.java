@@ -80,6 +80,8 @@ public class MainController implements HTTPWebUtilDomi.OnResponseListener, View.
 
                 new Thread(
                         () -> {
+                            //https://www.w3schools.com/jsref/jsref_encodeURI.asp
+                            //http://192.168.0.10:8070/domain?hostname=https://google.com?a=b&c=d
                             util.GETrequest(Constants.HOST_CALLBACK, Constants.URL_DOMAIN + hostName);
 
                             // Updated history

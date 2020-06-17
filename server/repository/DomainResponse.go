@@ -24,8 +24,9 @@ func GetDomain(host string, db *sql.DB) *model.Domain {
 
 	if err != nil {
 		log.Fatal(err.Error())
+		// return nil, err
 	}
-
+	//
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -60,7 +61,7 @@ func createDomain(domainA DomainAPI, db *sql.DB) *model.Domain {
 	// Created a domain that goin to return
 	domainResults := model.Domain{Servers: make([]model.Server, 0, 100)}
 
-	// The domain exists in the databas
+	// The domain exists in the database
 	if domainExists != nil {
 		// The api rest api.ssllabs.com can not get results
 		if len(domainA.Erros) > 0 {

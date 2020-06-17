@@ -39,6 +39,7 @@ func (r domainRepo) FetchDomain(hostname string) (*DomainDB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	var host, sslgrade, previoussslgrade string
@@ -56,7 +57,7 @@ func (r domainRepo) FetchDomain(hostname string) (*DomainDB, error) {
 }
 
 func (r domainRepo) UpdateDomain(d *DomainDB) error {
-	sqlExec := `UPDATE androidqueries.domain SET sslgrade =  $1, sslpreviousgrade = $2 , lastsearch = NOW() WHERE host = $3`
+	sqlExec := `UPDATE androidqueries.domain SET sslgrade = $1, sslpreviousgrade = $2 , lastsearch = NOW() WHERE host = $3`
 	_, err := r.db.Exec(sqlExec, d.SslGrade, d.PreviousSslGrade, d.Host)
 	if err != nil {
 		return err

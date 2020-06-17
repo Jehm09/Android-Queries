@@ -52,6 +52,7 @@ func (a *api) Router() *fasthttprouter.Router {
 
 // localhost:8070/domain?hostname=x
 func (a *api) getDomain(ctx *fasthttp.RequestCtx) {
+	// limpiar entradas
 	nameByte := ctx.QueryArgs().Peek("hostname")
 
 	hostName := string(nameByte)
